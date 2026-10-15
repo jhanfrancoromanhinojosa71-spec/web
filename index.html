@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mario Matemático</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- =========================
+     MENÚ DE INICIO
+========================= -->
+<div id="menuInicio">
+
+    <h1>🍄 MARIO MATEMÁTICO 🍄</h1>
+    <p>¡Resuelve las operaciones y supera todos los niveles!</p>
+
+    <button id="btnIniciar" onclick="iniciarJuego()">
+        ▶️ INICIAR JUEGO
+    </button>
+
+</div>
+
+
+<!-- =========================
+     JUEGO
+========================= -->
+<div id="juegoCompleto" style="display:none;">
+
+    <div id="hud">
+
+        <h2>¿CUÁL ES EL RESULTADO?</h2>
+
+        <h2 id="pregunta">Cargando...</h2>
+
+        <div id="info">
+
+            <span>❤️ Vidas:
+                <strong id="vidas">3</strong>
+            </span>
+
+            <span>⭐ Puntos:
+                <strong id="puntos">0</strong>
+            </span>
+
+            <span>🏆 Nivel:
+                <strong id="nivel">1</strong>
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div id="juego">
+        
+        <div class="bloque" id="b1">?</div>
+        <div class="bloque" id="b2">?</div>
+        <div class="bloque" id="b3">?</div>
+
+        <div id="mario"></div>
+
+        <div id="princesa" onclick="preguntarPrincesa()"></div>
+        
+    </div>
+   
+</div>
+
+
+<!-- =========================
+     PANTALLA NIVEL COMPLETADO
+========================= -->
+<div id="nivelCompletado">
+
+    <h1>🎉 ¡NIVEL COMPLETADO! 🎉</h1>
+
+    <h2 id="mensajeNivel">
+        ¡Excelente trabajo!
+    </h2>
+
+    <button onclick="siguienteNivel()">
+        ▶️ SIGUIENTE NIVEL
+    </button>
+
+</div>
+
+
+<!-- =========================
+     GAME OVER
+========================= -->
+<div id="gameOver">
+
+    <h1>💀 GAME OVER</h1>
+
+    <h2>Te quedaste sin vidas</h2>
+
+    <button onclick="continuarDesdeNivel()">
+        🔄 CONTINUAR DESDE ESTE NIVEL
+    </button>
+
+</div>
+
+
+<!-- =========================
+     FINAL
+========================= -->
+<div id="finalJuego">
+
+    <h1>👑 ¡FELICIDADES! 👑</h1>
+
+    <h2>¡Completaste todos los niveles!</h2>
+
+    <p id="puntosFinales"></p>
+
+    <button onclick="reiniciarJuego()">
+        🔄 VOLVER A JUGAR
+    </button>
+
+</div>
+
+
+<!-- =========================
+     RETO DE LA PRINCESA
+========================= -->
+<div id="modal-princesa">
+
+    <div id="contenido-modal">
+
+        <h3>👸 ¡Reto de la Princesa!</h3>
+
+        <p id="pregunta-princesa"></p>
+
+        <input
+            type="number"
+            id="respuesta-princesa"
+            placeholder="Tu respuesta"
+        >
+
+        <button onclick="verificarRespuestaPrincesa()">
+            Responder
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ==================================================
+     AUDIOS
+     AQUÍ COLOCAS TUS ARCHIVOS DE AUDIO
+================================================== -->
+
+<!-- 🎵 Música del menú -->
+<audio id="musicaMenu" loop>
+    <source src="super-mario-bros.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 🎵 Música del juego -->
+<audio id="musicaJuego" loop>
+    <source src="super-mario-bros.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 🎵 Música de Game Over -->
+<audio id="musicaGameOver">
+    <source src="mario-bros-game-over-1.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 🎵 Música de nivel completado -->
+<audio id="musicaNivel">
+    <source src="nivel-completado.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 🎵 Música final -->
+<audio id="musicaFinal">
+    <source src="final.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 🔊 Sonido de salto -->
+<audio id="sonidoSalto">
+    <source src="salto de mario.wav" type="audio/mpeg">
+</audio>
+
+<!-- 🔊 Sonido de respuesta correcta -->
+<audio id="sonidoCorrecto">
+    <source src="correcta.wav" type="audio/mpeg">
+</audio>
+
+<!-- 🔊 Sonido de respuesta incorrecta -->
+<audio id="sonidoIncorrecto">
+    <source src="mario-bros.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 🔊 Sonido al golpear bloque -->
+<audio id="sonidoBloque">
+    <source src="bloque.mp3" type="audio/mpeg">
+</audio>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
