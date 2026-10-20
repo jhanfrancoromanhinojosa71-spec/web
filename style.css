@@ -1,442 +1,833 @@
-/* =====================================================
-   PÁGINA
-===================================================== */
+// ======================================
+// MARIO MATEMÁTICO
+// ======================================
 
-body {
+// NIVELES Y PREGUNTAS
 
-    margin: 0;
+const niveles = [
+    {
+        nombre: "SUMAS",
+        preguntas: [
+            { texto: "5 + 3", respuesta: 8 },
+            { texto: "10 + 4", respuesta: 14 },
+            { texto: "7 + 2", respuesta: 9 },
+            { texto: "9 + 5", respuesta: 14 },
+            { texto: "6 + 6", respuesta: 12 }
+        ]
+    },
 
-    font-family: Arial, sans-serif;
+    {
+        nombre: "RESTAS",
+        preguntas: [
+            { texto: "10 - 4", respuesta: 6 },
+            { texto: "15 - 7", respuesta: 8 },
+            { texto: "20 - 5", respuesta: 15 },
+            { texto: "25 - 10", respuesta: 15 },
+            { texto: "30 - 10", respuesta: 20 }
+        ]
+    },
 
-    background: #5ec8ff;
+    {
+        nombre: "MULTIPLICACIONES",
+        preguntas: [
+            { texto: "2 × 3", respuesta: 6 },
+            { texto: "4 × 5", respuesta: 20 },
+            { texto: "6 × 4", respuesta: 24 },
+            { texto: "8 × 3", respuesta: 24 },
+            { texto: "6 × 5", respuesta: 30 }
+        ]
+    }
+];
 
-    user-select: none;
 
+// ======================================
+// VARIABLES
+// ======================================
+
+let nivelActual = 0;
+let preguntas = [];
+let actual = 0;
+
+let vidas = 3;
+let puntos = 0;
+
+let x = 50;
+let saltando = false;
+let juegoActivo = false;
+let bloqueado = false;
+
+let moverIzquierda = false;
+let moverDerecha = false;
+
+let posicionSalto = 0;
+let velocidadSalto = 0;
+let ultimaActualizacion = 0;
+
+
+// ======================================
+// ELEMENTOS HTML
+// ======================================
+
+const menuInicio = document.getElementById("menuInicio");
+const juegoCompleto = document.getElementById("juegoCompleto");
+
+const escenario = document.getElementById("juego");
+const mario = document.getElementById("mario");
+
+const preguntaTexto = document.getElementById("pregunta");
+const mensaje = document.getElementById("mensaje");
+
+const vidasTexto = document.getElementById("vidas");
+const puntosTexto = document.getElementById("puntos");
+const nivelTexto = document.getElementById("nivel");
+const etiquetaNivel = document.getElementById("etiquetaNivel");
+
+const bloques = [
+    document.getElementById("b1"),
+    document.getElementById("b2"),
+    document.getElementById("b3")
+];
+
+const pantallaNivel = document.getElementById("nivelCompletado");
+const pantallaGameOver = document.getElementById("gameOver");
+const pantallaFinal = document.getElementById("finalJuego");
+const modalPrincesa = document.getElementById("modal-princesa");
+
+const musica = document.getElementById("musica");
+const sonidoSalto = document.getElementById("sonidoSalto");
+const sonidoCorrecto = document.getElementById("sonidoCorrecto");
+const sonidoBloque = document.getElementById("sonidoBloque");
+const musicaNivel = document.getElementById("musicaNivel");
+const musicaGameOver = document.getElementById("musicaGameOver");
+const musicaFinal = document.getElementById("musicaFinal");
+
+
+// ======================================
+// FUNCIONES DE SONIDO
+// ======================================
+
+function reproducirSonido(audio) {
+    if (!audio) return;
+
+    try {
+        audio.currentTime = 0;
+
+        const reproduccion = audio.play();
+
+        if (reproduccion && reproduccion.catch) {
+            reproduccion.catch(function () {});
+        }
+    } catch (error) {
+        // El juego puede continuar aunque falle el sonido.
+    }
+}
+
+function detenerSonidos() {
+    [
+        musica,
+        musicaNivel,
+        musicaGameOver,
+        musicaFinal
+    ].forEach(function (audio) {
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+    });
+}
+
+function reproducirMusicaPrincipal() {
+    if (!musica) return;
+
+    musica.volume = 0.3;
+    reproducirSonido(musica);
 }
 
 
-/* =====================================================
-   MENÚ DE INICIO
-===================================================== */
+// ======================================
+// INICIAR JUEGO
+// ======================================
 
-#menuInicio {
+function iniciarJuego() {
+    menuInicio.style.display = "none";
+    juegoCompleto.style.display = "block";
 
-    height: 100vh;
+    nivelActual = 0;
+    vidas = 3;
+    puntos = 0;
+    actual = 0;
 
-    display: flex;
+    x = 50;
+    saltando = false;
+    bloqueado = false;
 
-    flex-direction: column;
+    juegoActivo = true;
 
-    justify-content: center;
+    ocultarPantallas();
+    actualizarInformacion();
+    cargarNivel();
 
-    align-items: center;
+    reproducirMusicaPrincipal();
 
-    text-align: center;
-
-    background-image:
-        url("FONDO.jpeg");
-
-    background-size: cover;
-
-    background-position: center;
-
+    mario.style.left = x + "px";
+    mario.style.bottom = "0px";
 }
 
 
-#menuInicio h1 {
+// ======================================
+// OCULTAR TODAS LAS PANTALLAS
+// ======================================
 
-    font-size: 45px;
-
-    color: rgb(25, 100, 197);
-    text-shadow:
-        3px 3px 5px rgb(26, 10, 85);
+function ocultarPantallas() {
+    pantallaNivel.style.display = "none";
+    pantallaGameOver.style.display = "none";
+    pantallaFinal.style.display = "none";
+    modalPrincesa.style.display = "none";
 }
 
 
-#menuInicio p {
+// ======================================
+// CARGAR NIVEL
+// ======================================
 
-    font-size: 22px;
+function cargarNivel() {
+    if (nivelActual >= niveles.length) {
+        terminarJuego();
+        return;
+    }
 
-    color:  rgb(175, 177, 39);
+    actual = 0;
 
+    preguntas = niveles[nivelActual].preguntas.slice();
+
+    etiquetaNivel.textContent =
+        "NIVEL " + (nivelActual + 1) +
+        " - " + niveles[nivelActual].nombre;
+
+    mensaje.textContent = "¡Encuentra la respuesta correcta!";
+
+    actualizarInformacion();
+    mostrarPregunta();
 }
 
 
-#menuInicio button {
+// ======================================
+// MOSTRAR PREGUNTA
+// ======================================
 
-    font-size: 25px;
+function mostrarPregunta() {
+    if (actual >= preguntas.length) {
+        completarNivel();
+        return;
+    }
 
-    padding: 15px 35px;
+    const preguntaActual = preguntas[actual];
 
-    border: none;
+    preguntaTexto.textContent =
+        "¿Cuánto es " + preguntaActual.texto + "?";
 
-    border-radius: 15px;
+    mensaje.textContent =
+        "Pregunta " + (actual + 1) +
+        " de " + preguntas.length;
 
-    cursor: pointer;
+    bloqueado = false;
 
-    background: #0f1188;
-
+    colocarRespuestas(preguntaActual.respuesta);
 }
 
 
-/* =====================================================
-   HUD
-===================================================== */
+// ======================================
+// COLOCAR RESPUESTAS EN LOS BLOQUES
+// ======================================
 
-#hud {
+function colocarRespuestas(respuestaCorrecta) {
+    let respuestas = [respuestaCorrecta];
 
-    height: 150px;
+    while (respuestas.length < 3) {
+        let numeroIncorrecto;
 
-    background: white;
+        if (nivelActual === 0) {
+            numeroIncorrecto =
+                respuestaCorrecta +
+                Math.floor(Math.random() * 9) + 1;
+        } else {
+            numeroIncorrecto =
+                respuestaCorrecta +
+                Math.floor(Math.random() * 15) + 1;
+        }
 
-    text-align: center;
+        if (!respuestas.includes(numeroIncorrecto)) {
+            respuestas.push(numeroIncorrecto);
+        }
+    }
 
-    padding: 10px;
+    // Mezclar las respuestas para que no aparezcan
+    // siempre en el mismo bloque.
 
-    box-shadow:
-        0px 4px 10px
-        rgba(0,0,0,0.2);
+    for (let i = respuestas.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
 
+        [respuestas[i], respuestas[j]] =
+            [respuestas[j], respuestas[i]];
+    }
+
+    bloques.forEach(function (bloque, indice) {
+        bloque.textContent = respuestas[indice];
+        bloque.dataset.respuesta = respuestas[indice];
+
+        bloque.style.display = "block";
+        bloque.disabled = false;
+        bloque.style.opacity = "1";
+    });
 }
 
 
-#info {
+// ======================================
+// RESPONDER AL TOCAR UN BLOQUE
+// ======================================
 
-    font-size: 18px;
+function seleccionarBloque(indice) {
+    if (!juegoActivo || bloqueado) return;
 
-    margin-top: 10px;
+    if (actual >= preguntas.length) return;
 
-    display: flex;
+    const respuestaElegida =
+        Number(bloques[indice].dataset.respuesta);
 
-    justify-content: center;
-
-    gap: 30px;
-
-}
-/* =====================================================
-   ESCENARIO
-===================================================== */
-
-#juego {
-    position: relative;
-    height: 500px;
-    max-width: 1200px;
-    background-image: url("fondo1.gif"); /* Extensión corregida */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    margin: auto;
-    overflow: hidden;
-} /* Llave de cierre agregada */
-
-#fondoVideo {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    z-index: 0;
-}
-
-/* =====================================================
-   MARIO
-===================================================== */
-
-#mario {
-
-    position: absolute;
-
-    bottom: 0;
-
-    left: 50px;
-
-    width: 100px;
-
-    height: 130px;
-
-    background-image:
-        url("mario2.gif");
-
-    background-size: cover;
-
-    background-repeat: no-repeat;
-
-    background-position: center;
-
-    transition:
-        left 0.1s linear;
-
+    comprobarRespuesta(respuestaElegida);
 }
 
 
-/* =====================================================
-   PRINCESA
-===================================================== */
+// ======================================
+// COMPROBAR RESPUESTA
+// ======================================
 
-#princesa {
+function comprobarRespuesta(respuestaElegida) {
+    if (!juegoActivo || bloqueado) return;
 
-    position: absolute;
+    bloqueado = true;
 
-    bottom: 0;
+    const respuestaCorrecta =
+        preguntas[actual].respuesta;
 
-    right: 50px;
+    if (respuestaElegida === respuestaCorrecta) {
 
-    width: 120px;
+        // RESPUESTA CORRECTA
 
-    height: 160px;
+        puntos += 10;
 
-    background-image:
-        url("princesa.gif");
+        mensaje.textContent =
+            "⭐ ¡CORRECTO! Ganaste 10 puntos.";
 
-    background-size: cover;
+        reproducirSonido(sonidoCorrecto);
 
-    background-repeat: no-repeat;
+    } else {
 
-    background-position: center;
+        // RESPUESTA INCORRECTA
 
-    cursor: pointer;
+        vidas--;
 
+        mensaje.textContent =
+            "❌ Respuesta incorrecta. La respuesta era " +
+            respuestaCorrecta + ".";
+
+        reproducirSonido(sonidoBloque);
+    }
+
+    actualizarInformacion();
+
+    if (vidas <= 0) {
+        setTimeout(function () {
+            mostrarGameOver();
+        }, 900);
+
+        return;
+    }
+
+    setTimeout(function () {
+        if (!juegoActivo) return;
+
+        actual++;
+
+        mostrarPregunta();
+
+    }, 1100);
 }
 
 
-/* =====================================================
-   BLOQUES
-===================================================== */
+// ======================================
+// ACTUALIZAR VIDAS, PUNTOS Y NIVEL
+// ======================================
 
-.bloque {
-
-    position: absolute;
-
-    top: 100px;
-
-    width: 80px;
-
-    height: 60px;
-
-    background-image:
-        url("bloque.gif");
-
-    background-size: cover;
-
-    background-position: center;
-
-    background-repeat: no-repeat;
-
-    color: white;
-
-    font-size: 26px;
-
-    font-weight: bold;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    text-shadow:
-        2px 2px 4px black;
-
+function actualizarInformacion() {
+    vidasTexto.textContent = vidas;
+    puntosTexto.textContent = puntos;
+    nivelTexto.textContent = nivelActual + 1;
 }
 
 
-#b1 {
-    left: 30%;
+// ======================================
+// MOVIMIENTO CON TECLADO
+// ======================================
+
+document.addEventListener("keydown", function (e) {
+
+    if (!juegoActivo) return;
+
+    if (modalPrincesa.style.display === "flex") return;
+
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        e.preventDefault();
+    }
+
+    if (e.key === "ArrowRight") {
+        moverDerecha = true;
+    }
+
+    if (e.key === "ArrowLeft") {
+        moverIzquierda = true;
+    }
+
+    if (
+        e.code === "Space" ||
+        e.key === "ArrowUp"
+    ) {
+        e.preventDefault();
+        saltar();
+    }
+});
+
+document.addEventListener("keyup", function (e) {
+
+    if (
+        e.key === "ArrowRight" ||
+        e.key === "ArrowLeft"
+    ) {
+        moverDerecha = false;
+        moverIzquierda = false;
+    }
+});
+
+
+// Evitar que el movimiento continúe si se pierde el foco.
+
+window.addEventListener("blur", function () {
+    moverIzquierda = false;
+    moverDerecha = false;
+});
+
+
+// ======================================
+// BOTONES PARA MOVER A MARIO EN CELULAR
+// ======================================
+
+const btnIzquierda = document.getElementById("btnIzquierda");
+const btnDerecha = document.getElementById("btnDerecha");
+const btnSaltar = document.getElementById("btnSaltar");
+
+
+function activarMovimiento(boton, direccion) {
+
+    boton.addEventListener("pointerdown", function (e) {
+
+        e.preventDefault();
+
+        if (!juegoActivo) return;
+
+        if (direccion === "izquierda") {
+            moverIzquierda = true;
+        }
+
+        if (direccion === "derecha") {
+            moverDerecha = true;
+        }
+    });
 }
 
 
-#b2 {
-    left: 50%;
+activarMovimiento(btnIzquierda, "izquierda");
+activarMovimiento(btnDerecha, "derecha");
+
+
+function detenerMovimiento() {
+    moverIzquierda = false;
+    moverDerecha = false;
+}
+
+document.addEventListener("pointerup", detenerMovimiento);
+document.addEventListener("pointercancel", detenerMovimiento);
+
+
+// Botón de salto.
+
+btnSaltar.addEventListener("pointerdown", function (e) {
+
+    e.preventDefault();
+
+    if (!juegoActivo) return;
+
+    saltar();
+});
+
+
+// ======================================
+// ACTUALIZAR MOVIMIENTO
+// ======================================
+
+function actualizarMovimiento() {
+
+    if (juegoActivo) {
+
+        const anchoEscenario = escenario.clientWidth;
+        const anchoMario = mario.offsetWidth;
+
+        const limite = Math.max(
+            0,
+            anchoEscenario - anchoMario
+        );
+
+        if (moverDerecha) {
+            x += 5;
+        }
+
+        if (moverIzquierda) {
+            x -= 5;
+        }
+
+        // Evitar que Mario salga del escenario.
+
+        x = Math.max(0, Math.min(x, limite));
+
+        mario.style.left = x + "px";
+
+        // Actualizar el salto.
+
+        if (saltando) {
+
+            velocidadSalto -= 0.8;
+            posicionSalto += velocidadSalto;
+
+            if (posicionSalto <= 0) {
+                posicionSalto = 0;
+                velocidadSalto = 0;
+                saltando = false;
+            }
+
+            mario.style.bottom = posicionSalto + "px";
+
+            // Comprobar si Mario golpea algún bloque.
+
+            comprobarGolpeDuranteSalto();
+        }
+    }
+
+    requestAnimationFrame(actualizarMovimiento);
 }
 
 
-#b3 {
-    left: 70%;
+// ======================================
+// SALTO DE MARIO
+// ======================================
+
+function saltar() {
+
+    if (!juegoActivo || saltando) return;
+
+    saltando = true;
+    posicionSalto = 0;
+    velocidadSalto = 17;
+
+    reproducirSonido(sonidoSalto);
 }
 
 
-/* =====================================================
-   NIVEL COMPLETADO
-===================================================== */
+// ======================================
+// COMPROBAR SI MARIO GOLPEA UN BLOQUE
+// ======================================
 
-#nivelCompletado {
+function comprobarGolpeDuranteSalto() {
 
-    position: fixed;
+    if (!saltando || bloqueado || !juegoActivo) return;
 
-    inset: 0;
+    const marioRect = mario.getBoundingClientRect();
 
-    display: none;
+    bloques.forEach(function (bloque) {
 
-    flex-direction: column;
+        if (bloque.style.display === "none") return;
 
-    justify-content: center;
+        const bloqueRect = bloque.getBoundingClientRect();
 
-    align-items: center;
+        const hayContacto =
+            marioRect.left < bloqueRect.right &&
+            marioRect.right > bloqueRect.left &&
+            marioRect.top < bloqueRect.bottom &&
+            marioRect.bottom > bloqueRect.top;
 
-    text-align: center;
+        if (hayContacto) {
 
-    background:
-        rgba(0,0,0,0.85);
+            const respuesta =
+                Number(bloque.dataset.respuesta);
 
-    color: white;
-
-    z-index: 10;
-
+            comprobarRespuesta(respuesta);
+        }
+    });
 }
 
 
-#nivelCompletado button {
+// ======================================
+// COMPLETAR NIVEL
+// ======================================
 
-    padding: 15px 30px;
+function completarNivel() {
 
-    font-size: 22px;
+    juegoActivo = false;
 
-    border: none;
+    detenerMovimiento();
+    detenerSonidos();
 
-    border-radius: 10px;
+    if (nivelActual < niveles.length - 1) {
 
-    cursor: pointer;
+        pantallaNivel.style.display = "flex";
 
+        reproducirSonido(musicaNivel);
+
+    } else {
+
+        // Completó todos los niveles.
+
+        terminarJuego();
+    }
 }
 
 
-/* =====================================================
-   GAME OVER
-===================================================== */
+// ======================================
+// PASAR AL SIGUIENTE NIVEL
+// ======================================
 
-#gameOver {
+function siguienteNivel() {
 
-    position: fixed;
+    nivelActual++;
 
-    inset: 0;
+    if (nivelActual >= niveles.length) {
+        terminarJuego();
+        return;
+    }
 
-    display: none;
+    ocultarPantallas();
 
-    flex-direction: column;
+    x = 50;
+    mario.style.left = x + "px";
+    mario.style.bottom = "0px";
 
-    justify-content: center;
+    detenerSonidos();
 
-    align-items: center;
+    juegoActivo = true;
 
-    text-align: center;
+    cargarNivel();
 
-    background:
-        rgba(0,0,0,0.9);
-
-    color: white;
-
-    z-index: 20;
-
+    reproducirMusicaPrincipal();
 }
 
 
-#gameOver button {
+// ======================================
+// GAME OVER
+// ======================================
 
-    padding: 15px 30px;
+function mostrarGameOver() {
 
-    font-size: 20px;
+    juegoActivo = false;
 
+    detenerMovimiento();
+    detenerSonidos();
+
+    pantallaGameOver.style.display = "flex";
+
+    reproducirSonido(musicaGameOver);
 }
 
 
-/* =====================================================
-   FINAL
-===================================================== */
+// ======================================
+// VOLVER A INTENTAR EL NIVEL
+// ======================================
 
-#finalJuego {
+function continuarDesdeNivel() {
 
-    position: fixed;
+    ocultarPantallas();
+    detenerSonidos();
 
-    inset: 0;
+    vidas = 3;
+    actual = 0;
+    x = 50;
 
-    display: none;
+    mario.style.left = x + "px";
+    mario.style.bottom = "0px";
 
-    flex-direction: column;
+    juegoActivo = true;
 
-    justify-content: center;
+    actualizarInformacion();
+    cargarNivel();
 
-    align-items: center;
-
-    text-align: center;
-
-    background-image:
-        url("atardecer.jpg");
-
-    background-size: cover;
-
-    color: rgb(47, 4, 66);
-
-    z-index: 30;
-
+    reproducirMusicaPrincipal();
 }
 
 
-#finalJuego button {
+// ======================================
+// FINAL DEL JUEGO
+// ======================================
 
-    padding: 15px 30px;
+function terminarJuego() {
 
-    font-size: 20px;
+    juegoActivo = false;
 
+    detenerMovimiento();
+    detenerSonidos();
+
+    ocultarPantallas();
+
+    pantallaFinal.style.display = "flex";
+
+    document.getElementById("puntuacionFinal").textContent =
+        "⭐ Puntuación final: " + puntos + " puntos.";
+
+    reproducirSonido(musicaFinal);
 }
 
 
-/* =====================================================
-   MODAL PRINCESA
-===================================================== */
+// ======================================
+// REINICIAR TODO EL JUEGO
+// ======================================
 
-#modal-princesa {
+function reiniciarJuego() {
 
-    position: fixed;
+    ocultarPantallas();
+    detenerSonidos();
 
-    inset: 0;
+    nivelActual = 0;
+    actual = 0;
+    vidas = 3;
+    puntos = 0;
+    x = 50;
 
-    background:
-        rgba(0,0,0,0.6);
+    saltando = false;
+    posicionSalto = 0;
+    velocidadSalto = 0;
 
-    display: none;
+    juegoActivo = true;
 
-    justify-content: center;
+    mario.style.left = x + "px";
+    mario.style.bottom = "0px";
 
-    align-items: center;
+    actualizarInformacion();
+    cargarNivel();
 
-    z-index: 50;
-
+    reproducirMusicaPrincipal();
 }
 
 
-#contenido-modal {
+// ======================================
+// VOLVER AL MENÚ PRINCIPAL
+// ======================================
 
-    background: rgb(23, 99, 99);
+function volverAlMenu() {
 
-    padding: 25px;
+    juegoActivo = false;
 
-    border-radius: 15px;
+    detenerMovimiento();
+    detenerSonidos();
+    ocultarPantallas();
 
-    text-align: center;
-
-    width: 300px;
-
+    juegoCompleto.style.display = "none";
+    menuInicio.style.display = "flex";
 }
 
 
-#contenido-modal input {
+// ======================================
+// DESAFÍO DE LA PRINCESA
+// ======================================
 
-    padding: 10px;
+function preguntarPrincesa() {
 
-    font-size: 18px;
+    if (!juegoActivo) return;
 
-    width: 200px;
+    document.getElementById("respuestaPrincesa").value = "";
 
+    document.getElementById("mensajePrincesa").textContent =
+        "";
+
+    document.getElementById("preguntaPrincesa").textContent =
+        "¡Mario! Resuelve este desafío: ¿cuánto es 20 × 9?";
+
+    modalPrincesa.style.display = "flex";
 }
 
 
-#contenido-modal button {
+// ======================================
+// COMPROBAR RESPUESTA DE LA PRINCESA
+// ======================================
 
-    margin-top: 15px;
+function comprobarPrincesa() {
 
-    padding: 10px 20px;
+    if (!juegoActivo) return;
 
-    cursor: pointer;
+    const entrada =
+        document.getElementById("respuestaPrincesa");
 
+    const respuesta = entrada.value.trim();
+
+    const mensajePrincesa =
+        document.getElementById("mensajePrincesa");
+
+    if (respuesta === "") {
+
+        mensajePrincesa.textContent =
+            "Escribe una respuesta primero.";
+
+        return;
+    }
+
+    if (Number(respuesta) === 180) {
+
+        puntos += 50;
+
+        actualizarInformacion();
+
+        mensajePrincesa.textContent =
+            "👑 ¡CORRECTO! Ganaste 50 puntos y salvaste el reino.";
+
+        reproducirSonido(sonidoCorrecto);
+
+        // Desactivar el juego mientras se muestra el resultado.
+
+        juegoActivo = false;
+
+        setTimeout(function () {
+
+            modalPrincesa.style.display = "none";
+
+            terminarJuego();
+
+        }, 1800);
+
+    } else {
+
+        mensajePrincesa.textContent =
+            "❌ Inténtalo otra vez. ¡Tú puedes!";
+    }
 }
+
+
+// ======================================
+// CERRAR EL DESAFÍO DE LA PRINCESA
+// ======================================
+
+function cerrarPrincesa() {
+
+    modalPrincesa.style.display = "none";
+}
+
+
+// ======================================
+// INICIAR EL BUCLE DE MOVIMIENTO
+// ======================================
+
+actualizarMovimiento();
