@@ -9,196 +9,156 @@
 
 <body>
 
-<!-- =========================
-     MENÚ DE INICIO
-========================= -->
-<div id="menuInicio">
+    <!-- MENÚ DE INICIO -->
+    <section id="menuInicio">
+        <h1>🍄 MARIO MATEMÁTICO 🍄</h1>
+        <p>¡Resuelve las operaciones y salva el reino!</p>
 
-    <h1>🍄 MARIO MATEMÁTICO 🍄</h1>
-    <p>¡Resuelve las operaciones y supera todos los niveles!</p>
+        <img src="mario2.gif" alt="Mario" class="mario-menu">
 
-    <button id="btnIniciar" onclick="iniciarJuego()">
-        ▶️ INICIAR JUEGO
-    </button>
-
-</div>
-
-
-<!-- =========================
-     JUEGO
-========================= -->
-<div id="juegoCompleto" style="display:none;">
-
-    <div id="hud">
-
-        <h2>¿CUÁL ES EL RESULTADO?</h2>
-
-        <h2 id="pregunta">Cargando...</h2>
-
-        <div id="info">
-
-            <span>❤️ Vidas:
-                <strong id="vidas">3</strong>
-            </span>
-
-            <span>⭐ Puntos:
-                <strong id="puntos">0</strong>
-            </span>
-
-            <span>🏆 Nivel:
-                <strong id="nivel">1</strong>
-            </span>
-
-        </div>
-
-    </div>
-
-
-    <div id="juego">
-        
-        <div class="bloque" id="b1">?</div>
-        <div class="bloque" id="b2">?</div>
-        <div class="bloque" id="b3">?</div>
-
-        <div id="mario"></div>
-
-        <div id="princesa" onclick="preguntarPrincesa()"></div>
-        
-    </div>
-   
-</div>
-
-
-<!-- =========================
-     PANTALLA NIVEL COMPLETADO
-========================= -->
-<div id="nivelCompletado">
-
-    <h1>🎉 ¡NIVEL COMPLETADO! 🎉</h1>
-
-    <h2 id="mensajeNivel">
-        ¡Excelente trabajo!
-    </h2>
-
-    <button onclick="siguienteNivel()">
-        ▶️ SIGUIENTE NIVEL
-    </button>
-
-</div>
-
-
-<!-- =========================
-     GAME OVER
-========================= -->
-<div id="gameOver">
-
-    <h1>💀 GAME OVER</h1>
-
-    <h2>Te quedaste sin vidas</h2>
-
-    <button onclick="continuarDesdeNivel()">
-        🔄 CONTINUAR DESDE ESTE NIVEL
-    </button>
-
-</div>
-
-
-<!-- =========================
-     FINAL
-========================= -->
-<div id="finalJuego">
-
-    <h1>👑 ¡FELICIDADES! 👑</h1>
-
-    <h2>¡Completaste todos los niveles!</h2>
-
-    <p id="puntosFinales"></p>
-
-    <button onclick="reiniciarJuego()">
-        🔄 VOLVER A JUGAR
-    </button>
-
-</div>
-
-
-<!-- =========================
-     RETO DE LA PRINCESA
-========================= -->
-<div id="modal-princesa">
-
-    <div id="contenido-modal">
-
-        <h3>👸 ¡Reto de la Princesa!</h3>
-
-        <p id="pregunta-princesa"></p>
-
-        <input
-            type="number"
-            id="respuesta-princesa"
-            placeholder="Tu respuesta"
-        >
-
-        <button onclick="verificarRespuestaPrincesa()">
-            Responder
+        <br>
+        <button id="btnIniciar" onclick="iniciarJuego()">
+            ▶ INICIAR JUEGO
         </button>
 
-    </div>
-
-</div>
-
-
-<!-- ==================================================
-     AUDIOS
-     AQUÍ COLOCAS TUS ARCHIVOS DE AUDIO
-================================================== -->
-
-<!-- 🎵 Música del menú -->
-<audio id="musicaMenu" loop>
-    <source src="super-mario-bros.mp3" type="audio/mpeg">
-</audio>
-
-<!-- 🎵 Música del juego -->
-<audio id="musicaJuego" loop>
-    <source src="super-mario-bros.mp3" type="audio/mpeg">
-</audio>
-
-<!-- 🎵 Música de Game Over -->
-<audio id="musicaGameOver">
-    <source src="mario-bros-game-over-1.mp3" type="audio/mpeg">
-</audio>
-
-<!-- 🎵 Música de nivel completado -->
-<audio id="musicaNivel">
-    <source src="nivel-completado.mp3" type="audio/mpeg">
-</audio>
-
-<!-- 🎵 Música final -->
-<audio id="musicaFinal">
-    <source src="final.mp3" type="audio/mpeg">
-</audio>
-
-<!-- 🔊 Sonido de salto -->
-<audio id="sonidoSalto">
-    <source src="salto de mario.wav" type="audio/mpeg">
-</audio>
-
-<!-- 🔊 Sonido de respuesta correcta -->
-<audio id="sonidoCorrecto">
-    <source src="correcta.wav" type="audio/mpeg">
-</audio>
-
-<!-- 🔊 Sonido de respuesta incorrecta -->
-<audio id="sonidoIncorrecto">
-    <source src="mario-bros.mp3" type="audio/mpeg">
-</audio>
-
-<!-- 🔊 Sonido al golpear bloque -->
-<audio id="sonidoBloque">
-    <source src="bloque.mp3" type="audio/mpeg">
-</audio>
+        <p class="instrucciones">
+            ⬅️ ➡️ Mover a Mario<br>
+            ESPACIO o 🆙 SALTAR para golpear los bloques
+        </p>
+    </section>
 
 
-<script src="script.js"></script>
+    <!-- JUEGO PRINCIPAL -->
+    <main id="juegoCompleto" style="display: none;">
+
+        <header class="cabecera">
+            <h1>🍄 MARIO MATEMÁTICO 🍄</h1>
+
+            <div class="informacion">
+                <span>❤️ Vidas: <b id="vidas">3</b></span>
+                <span>⭐ Puntos: <b id="puntos">0</b></span>
+                <span>🏆 Nivel: <b id="nivel">1</b></span>
+            </div>
+        </header>
+
+        <h2 id="pregunta">¿Cuánto es 5 + 3?</h2>
+        <p id="mensaje">¡Busca el bloque con la respuesta correcta!</p>
+
+        <!-- ESCENARIO -->
+        <section id="juego">
+
+            <div id="etiquetaNivel">NIVEL 1</div>
+
+            <div id="bloques">
+
+                <button class="bloque" id="b1" onclick="seleccionarBloque(0)">
+                    ?
+                </button>
+
+                <button class="bloque" id="b2" onclick="seleccionarBloque(1)">
+                    ?
+                </button>
+
+                <button class="bloque" id="b3" onclick="seleccionarBloque(2)">
+                    ?
+                </button>
+
+            </div>
+
+            <img
+                id="mario"
+                src="mario2.gif"
+                alt="Mario"
+                draggable="false"
+            >
+
+            <img
+                id="princesa"
+                src="princesa.gif"
+                alt="Princesa"
+                onclick="preguntarPrincesa()"
+                title="Haz clic para hablar con la princesa"
+                draggable="false"
+            >
+
+            <!-- CONTROLES PARA CELULAR -->
+            <div id="controles">
+
+                <button id="btnIzquierda" class="control" aria-label="Mover a la izquierda">
+                    ⬅️
+                </button>
+
+                <button id="btnSaltar" class="control btn-saltar">
+                    🆙 SALTAR
+                </button>
+
+                <button id="btnDerecha" class="control" aria-label="Mover a la derecha">
+                    ➡️
+                </button>
+
+            </div>
+
+        </section>
+
+        <p class="ayuda">
+            Computadora: usa las flechas y la barra espaciadora.<br>
+            Celular: mantén presionadas las flechas y toca SALTAR.
+        </p>
+
+        <!-- NIVEL COMPLETADO -->
+        <section id="nivelCompletado" class="pantalla" style="display: none;">
+            <h2>🎉 ¡NIVEL COMPLETADO!</h2>
+            <p>¡Muy bien! Has superado este desafío matemático.</p>
+            <button onclick="siguienteNivel()">▶ SIGUIENTE NIVEL</button>
+        </section>
+
+        <!-- GAME OVER -->
+        <section id="gameOver" class="pantalla" style="display: none;">
+            <h2>💔 GAME OVER</h2>
+            <p>¡No te rindas! Puedes volver a intentarlo.</p>
+            <button onclick="continuarDesdeNivel()">🔄 VOLVER A INTENTAR</button>
+            <button onclick="volverAlMenu()">🏠 MENÚ PRINCIPAL</button>
+        </section>
+
+        <!-- FINAL DEL JUEGO -->
+        <section id="finalJuego" class="pantalla" style="display: none;">
+            <h2>👑 ¡SALVASTE EL REINO!</h2>
+            <p>¡Felicitaciones! Has completado todos los niveles.</p>
+            <p id="puntuacionFinal"></p>
+            <button onclick="reiniciarJuego()">🔄 JUGAR OTRA VEZ</button>
+        </section>
+
+        <!-- DESAFÍO DE LA PRINCESA -->
+        <section id="modal-princesa" class="pantalla" style="display: none;">
+            <h2>👸 DESAFÍO DE LA PRINCESA</h2>
+            <p id="preguntaPrincesa">¿Cuánto es 20 × 9?</p>
+
+            <input
+                type="number"
+                id="respuestaPrincesa"
+                placeholder="Escribe tu respuesta"
+            >
+
+            <br>
+
+            <button onclick="comprobarPrincesa()">RESPONDER</button>
+            <button onclick="cerrarPrincesa()">VOLVER</button>
+
+            <p id="mensajePrincesa"></p>
+        </section>
+
+    </main>
+
+    <!-- MÚSICA Y SONIDOS -->
+    <audio id="musica" src="super-mario-bros.mp3" loop></audio>
+    <audio id="sonidoSalto" src="salto de mario.wav"></audio>
+    <audio id="sonidoCorrecto" src="correcta.wav"></audio>
+    <audio id="sonidoBloque" src="bloque.mp3"></audio>
+    <audio id="musicaNivel" src="nivel-completado.mp3"></audio>
+    <audio id="musicaGameOver" src="mario-bros-game-over-1.mp3"></audio>
+    <audio id="musicaFinal" src="final.mp3"></audio>
+
+    <script src="script.js"></script>
 
 </body>
 </html>
